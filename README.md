@@ -15,3 +15,7 @@ powershell -ExecutionPolicy Bypass -File .\start.ps1
 ```
 
 然后访问 `http://localhost:4173`。
+
+## Android APK
+
+仓库会通过 GitHub Actions 自动构建可直接安装的 Android APK。前往 Releases 页面，下载最新版本中的 `rixu-android.apk`。
