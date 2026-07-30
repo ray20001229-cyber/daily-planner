@@ -1,0 +1,61 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "android/**"
+      - "index.html"
+      - "styles.css"
+      - "app.js"
+      - "icons/**"
+      - ".github/workflows/build-android.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
+      - name: Bundle offline web assets
+        run: |
+          mkdir -p android/app/src/main/assets/icons
+          cp index.html styles.css app.js manifest.webmanifest android/app/src/main/assets/
+          cp icons/icon.svg android/app/src/main/assets/icons/
+
+      - name: Build installable APK
+        working-directory: android
+        run: gradle assembleDebug
+
+      - name: Prepare APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk rixu-android.apk
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rixu-android
+          path: rixu-android.apk
+
+      - name: Publish latest Android release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete android-latest --cleanup-tag -y || true
+          gh release create android-latest rixu-android.apk \
+            --title "日序 Android 最新版" \
+            --notes "下载 rixu-android.apk 后，可直接安装到 Android 手机。"
