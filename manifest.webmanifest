@@ -1,0 +1,14 @@
+{
+  "name": "日序 · 我的日常安排",
+  "short_name": "日序",
+  "description": "离线可用的个人日常事项安排应用",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f1e8",
+  "theme_color": "#f5f1e8",
+  "lang": "zh-CN",
+  "icons": [
+    {"src":"./icons/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}
