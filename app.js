@@ -14,6 +14,7 @@ let selectedDate = today();
 let view = "today";
 let category = "";
 let deferredPrompt;
+let calendarMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 
 function save(){ localStorage.setItem(STORE_KEY, JSON.stringify(tasks)); render(); }
 function toast(text){ const el=$("#toast"); el.textContent=text; el.classList.add("show"); setTimeout(()=>el.classList.remove("show"),1800); }
@@ -68,6 +69,28 @@ function render(){
   $("#eyebrow").textContent=new Intl.DateTimeFormat("zh-CN",{year:"numeric",month:"long",day:"numeric",weekday:"long"}).format(new Date());
 }
 function syncNav(){ $$(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.view===view)); }
+function renderCalendar(){
+  const year=calendarMonth.getFullYear(), month=calendarMonth.getMonth();
+  $("#calendarMonthTitle").textContent=`${year}年 ${month+1}月`;
+  const grid=$("#calendarGrid"); grid.innerHTML="";
+  const first=new Date(year,month,1), mondayOffset=(first.getDay()+6)%7;
+  const start=new Date(year,month,1-mondayOffset);
+  for(let i=0;i<42;i++){
+    const d=new Date(start); d.setDate(start.getDate()+i);
+    const key=dateKey(d), btn=document.createElement("button");
+    btn.className=`calendar-day ${d.getMonth()!==month?"outside":""} ${key===selectedDate?"selected":""} ${key===today()?"today":""} ${tasks.some(t=>t.date===key)?"has-tasks":""}`;
+    btn.textContent=d.getDate();
+    btn.setAttribute("aria-label",`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`);
+    btn.onclick=()=>{selectedDate=key;view="today";category="";syncNav();$("#calendarDialog").close();render();};
+    grid.append(btn);
+  }
+}
+function openCalendar(){
+  const d=parseDate(selectedDate);
+  calendarMonth=new Date(d.getFullYear(),d.getMonth(),1);
+  renderCalendar();
+  $("#calendarDialog").showModal();
+}
 function openDialog(task){
   $("#taskForm").reset(); $("#taskId").value=task?.id||""; $("#dialogTitle").textContent=task?"编辑事项":"新建事项";
   $("#taskTitle").value=task?.title||""; $("#taskDate").value=task?.date||selectedDate; $("#taskTime").value=task?.time||"";
@@ -81,6 +104,11 @@ $("#taskForm").addEventListener("submit",e=>{
 });
 $("#deleteBtn").onclick=()=>{ const id=$("#taskId").value; if(confirm("确定删除这件事项吗？")){tasks=tasks.filter(t=>t.id!==id);$("#taskDialog").close();save();toast("事项已删除");}};
 $("#addBtn").onclick=()=>openDialog(); $("#emptyAddBtn").onclick=()=>openDialog(); $("#closeDialog").onclick=()=>$("#taskDialog").close(); $("#cancelBtn").onclick=()=>$("#taskDialog").close();
+$("#calendarBtn").onclick=openCalendar;
+$("#closeCalendarBtn").onclick=()=>$("#calendarDialog").close();
+$("#prevMonthBtn").onclick=()=>{calendarMonth.setMonth(calendarMonth.getMonth()-1);renderCalendar();};
+$("#nextMonthBtn").onclick=()=>{calendarMonth.setMonth(calendarMonth.getMonth()+1);renderCalendar();};
+$("#calendarTodayBtn").onclick=()=>{selectedDate=today();calendarMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);view="today";category="";syncNav();$("#calendarDialog").close();render();};
 $("#sortSelect").onchange=render;
 $$(".nav-item").forEach(b=>b.onclick=()=>{view=b.dataset.view;category="";if(view==="today")selectedDate=today();syncNav();render();});
 $$(".category-filter").forEach(b=>b.onclick=()=>{category=category===b.dataset.category?"":b.dataset.category;view="all";syncNav();render();});

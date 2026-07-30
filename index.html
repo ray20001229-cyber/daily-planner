@@ -46,6 +46,7 @@
           </div>
           <div class="top-actions">
             <button id="themeBtn" class="icon-btn" aria-label="切换深浅色">☾</button>
+            <button id="calendarBtn" class="calendar-btn" aria-label="打开月历"><span>▦</span><b>月历</b></button>
             <button id="addBtn" class="primary-btn"><span>＋</span> 新事项</button>
           </div>
         </header>
@@ -95,6 +96,22 @@
         <label>备注<textarea id="taskNotes" rows="3" maxlength="300" placeholder="补充一点细节（可选）"></textarea></label>
         <div class="dialog-actions"><button type="button" id="deleteBtn" class="danger-btn" hidden>删除</button><span></span><button type="button" id="cancelBtn" class="secondary-btn">取消</button><button type="submit" class="primary-btn">保存事项</button></div>
       </form>
+    </dialog>
+    <dialog id="calendarDialog" class="calendar-dialog">
+      <div class="calendar-panel">
+        <div class="calendar-head">
+          <button id="prevMonthBtn" class="icon-btn" aria-label="上个月">‹</button>
+          <div><p class="eyebrow">选择日期</p><h2 id="calendarMonthTitle"></h2></div>
+          <button id="nextMonthBtn" class="icon-btn" aria-label="下个月">›</button>
+          <button id="closeCalendarBtn" class="icon-btn calendar-close" aria-label="关闭">×</button>
+        </div>
+        <div class="calendar-weekdays"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
+        <div id="calendarGrid" class="calendar-grid"></div>
+        <div class="calendar-footer">
+          <button id="calendarTodayBtn" class="secondary-btn">回到今天</button>
+          <p><i></i> 圆点表示当天已有事项</p>
+        </div>
+      </div>
     </dialog>
     <div id="toast" class="toast" role="status"></div>
     <script src="./app.js"></script>
